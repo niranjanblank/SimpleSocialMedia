@@ -3,6 +3,7 @@ from app.schemas.user_schema import UserCreate
 from app.models.user import User
 from fastapi import HTTPException
 
+
 def create_user(db: Session, user: UserCreate):
     try:
         db_user = User(username=user.username, email=user.email, password=user.password)
@@ -14,7 +15,8 @@ def create_user(db: Session, user: UserCreate):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
-def get_user_by_id(db:Session, user_id: int):
+
+def get_user_by_id(db: Session, user_id: int):
     try:
         user = db.get(User, user_id)
         if user is None:
