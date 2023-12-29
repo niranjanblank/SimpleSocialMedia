@@ -5,7 +5,7 @@ from ..database import get_session
 from sqlmodel import Session
 from ..models.board import Board
 
-router = APIRouter
+router = APIRouter()
 
 
 @router.post("/boards", response_model=BoardRead)

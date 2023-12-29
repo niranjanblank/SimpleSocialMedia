@@ -55,6 +55,4 @@ def board_data(test_db_session: Session):
     test_board = Board(title="Test Board", description="This is a test board", owner_id=1)
     test_db_session.add(test_board)
     test_db_session.commit()
-    test_db_session.refresh(test_board)
-
-    yield test_board
+    return test_board
