@@ -50,4 +50,4 @@ def test_delete_board(client, board_data):
 
     # verify that the data is no longer available
     get_response = client.get(f"/boards/{board_id}")
-    assert get_response.status_code == 400
+    assert get_response.status_code == 404

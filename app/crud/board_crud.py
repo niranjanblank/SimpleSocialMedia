@@ -48,4 +48,12 @@ def update_board(db: Session, board_id: int, board: BoardUpdate):
 
 
 def delete_board(db: Session, board_id: int):
-    return None
+    try:
+        db_board = db.get(Board, board_id)
+        if not db_board:
+            raise HTTPException(status_code=404, detail="Board not found")
+        db.delete(db_board)
+        db.commit()
+        return {"deleted": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred in board deletion: {e}")
