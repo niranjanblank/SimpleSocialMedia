@@ -6,6 +6,7 @@ from app.database import get_session
 import os
 from dotenv import load_dotenv
 from ..models.user import User
+from ..models.board import Board
 
 load_dotenv()
 
@@ -47,3 +48,13 @@ def user_data(test_db_session):
     test_db_session.add(new_user)
     test_db_session.commit()
     return new_user  # return the user object or just the user ID as needed
+
+@pytest.fixture(scope="function")
+def board_data(test_db_session: Session):
+    # Create a test board
+    test_board = Board(title="Test Board", description="This is a test board", owner_id=1)
+    test_db_session.add(test_board)
+    test_db_session.commit()
+    test_db_session.refresh(test_board)
+
+    yield test_board
