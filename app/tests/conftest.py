@@ -64,7 +64,7 @@ def board_data(test_db_session: Session, user_data: User):
 
 # Fixture to create users in the database
 @pytest.fixture(scope="function")
-def create_test_users(test_db_session: Session,):
+def create_test_users(test_db_session: Session, ):
     users = [
         User(username=f"user{i}", email=f"user{i}@example.com", password="testpassword")
         for i in range(10)  # Adjust the range for desired number of test users
@@ -72,3 +72,16 @@ def create_test_users(test_db_session: Session,):
     test_db_session.add_all(users)
     test_db_session.commit()
     return users
+
+
+# Fixture to create boards in the database
+@pytest.fixture(scope="function")
+def create_test_boards(test_db_session, create_test_users):
+    boards = [
+        Board(title=f"Board {i}", description=f"Description {i}",
+              owner_id=create_test_users[i % len(create_test_users)].id)
+        for i in range(20)  # Creating 20 test boards
+    ]
+    test_db_session.add_all(boards)
+    test_db_session.commit()
+    return boards

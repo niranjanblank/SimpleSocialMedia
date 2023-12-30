@@ -1,4 +1,4 @@
-from sqlmodel import Session
+from sqlmodel import Session, select
 from ..schemas.schemas import BoardCreate, BoardUpdate
 from ..models.board import Board
 from fastapi import HTTPException
@@ -57,3 +57,17 @@ def delete_board(db: Session, board_id: int):
         return {"deleted": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred in board deletion: {e}")
+
+def read_boards(db: Session, skip: int, limit: int):
+    try:
+        # statement to select the users based on skip and limit for pagination
+        statement = select(Board).offset(skip).limit(limit)
+        boards_data = db.exec(statement).all()
+        return boards_data
+    except HTTPException as http_ex:
+        # Reraise the HTTPException to be handled by FastAPI
+        raise http_ex
+    except Exception as e:
+        # Handle unexpected errors
+        # Log the error or handle it as needed
+        raise HTTPException(status_code=500, detail=f"An error occurred while getting Boards: {e}")

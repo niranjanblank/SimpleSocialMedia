@@ -54,3 +54,29 @@ def test_delete_board(client, board_data):
     # verify that the data is no longer available
     get_response = client.get(f"/boards/{board_id}")
     assert get_response.status_code == 404
+
+
+def test_get_boards_pagination(client, create_test_boards):
+    # Test fetching the first few boards
+    response = client.get("/boards/?skip=0&limit=5")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 5  # Expecting 5 boards due to limit=5
+
+    # Test another page of boards
+    response = client.get("/boards/?skip=5&limit=5")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 5  # Expecting the next 5 boards due to skip=5
+
+    # Test edge case: Requesting more boards than exist
+    response = client.get("/boards/?skip=0&limit=50")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == len(create_test_boards)  # Expecting the total number of boards created, as it's less than limit
+
+    # Test edge case: Requesting with high skip
+    response = client.get("/boards/?skip=30&limit=5")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 0  # Expecting no boards as skip is beyond the total number of boards
