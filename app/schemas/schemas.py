@@ -46,6 +46,7 @@ class UserRead(UserBase):
 # Relationships
 class UserReadWithBoard(UserBase):
     boards: list[BoardRead] = []
+    id: int
 
 
 class BoardReadWithOwner(BoardBase):

@@ -29,3 +29,18 @@ def get_user_by_id(db: Session, user_id: int):
         # Handle unexpected errors
         # Log the error or handle it as needed
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+
+
+def read_users(db: Session, skip: int, limit: int):
+    try:
+        # statement to select the users based on skip and limit for pagination
+        statement = select(User).offset(skip).limit(limit)
+        users = db.exec(statement).all()
+        return users
+    except HTTPException as http_ex:
+        # Reraise the HTTPException to be handled by FastAPI
+        raise http_ex
+    except Exception as e:
+        # Handle unexpected errors
+        # Log the error or handle it as needed
+        raise HTTPException(status_code=500, detail=f"An error occurred while getting Users: {e}")

@@ -60,3 +60,15 @@ def board_data(test_db_session: Session, user_data: User):
     test_db_session.commit()
     test_db_session.refresh(test_board)  # Refresh to load any additional attributes
     return test_board
+
+
+# Fixture to create users in the database
+@pytest.fixture(scope="function")
+def create_test_users(test_db_session: Session,):
+    users = [
+        User(username=f"user{i}", email=f"user{i}@example.com", password="testpassword")
+        for i in range(10)  # Adjust the range for desired number of test users
+    ]
+    test_db_session.add_all(users)
+    test_db_session.commit()
+    return users

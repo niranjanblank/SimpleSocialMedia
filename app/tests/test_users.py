@@ -27,3 +27,31 @@ def test_get_user_by_id(client, user_data):
     assert user["id"] == user_id
     assert "username" in user  # Ensure the username is present
     assert "email" in user  # Ensure the email is present
+
+
+def test_user_pagination(client, create_test_users):
+    # fetch the data
+    response = client.get("/users/?skip=0&limit=5")
+    data = response.json()
+
+    assert response.status_code == 200
+    assert len(data) == 5
+
+    # Test another page of users
+    response = client.get("/users/?skip=5&limit=5")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 5  # Expecting the next 5 users
+
+    # Test edge case: Requesting more users than exist
+    response = client.get("/users/?skip=0&limit=20")
+    assert response.status_code == 200
+    data = response.json()
+    total_users = len(create_test_users)
+    assert len(data) == total_users  # Expecting the total number of users created, as it's less than limit
+
+    # Test edge case: Requesting with high skip
+    response = client.get("/users/?skip=15&limit=5")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 0  # Expecting no users as skip is beyond the total number of users
