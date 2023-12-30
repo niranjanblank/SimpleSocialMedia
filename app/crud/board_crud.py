@@ -1,5 +1,5 @@
 from sqlmodel import Session
-from ..schemas.board_schema import BoardCreate, BoardUpdate
+from ..schemas.schemas import BoardCreate, BoardUpdate
 from ..models.board import Board
 from fastapi import HTTPException
 def create_board(db: Session, board: BoardCreate):

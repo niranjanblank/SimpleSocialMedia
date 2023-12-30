@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
-from ..schemas.user_schema import UserRead, UserCreate
+from ..schemas.schemas import UserRead, UserCreate
 from ..crud.user_crud import create_user, get_user_by_id
 from ..database import get_session
 

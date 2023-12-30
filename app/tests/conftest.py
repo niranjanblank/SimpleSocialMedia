@@ -47,12 +47,16 @@ def user_data(test_db_session):
     new_user = User(username="testuser", email="test@example.com", password="hashedpassword")
     test_db_session.add(new_user)
     test_db_session.commit()
+    test_db_session.refresh(new_user)
     return new_user  # return the user object or just the user ID as needed
 
+
 @pytest.fixture(scope="function")
-def board_data(test_db_session: Session):
-    # Create a test board
-    test_board = Board(title="Test Board", description="This is a test board", owner_id=1)
+def board_data(test_db_session: Session, user_data: User):
+    # Create a test board with owner_id from user_data
+
+    test_board = Board(title="Test Board", description="This is a test board", owner_id=user_data.id)
     test_db_session.add(test_board)
     test_db_session.commit()
+    test_db_session.refresh(test_board)  # Refresh to load any additional attributes
     return test_board

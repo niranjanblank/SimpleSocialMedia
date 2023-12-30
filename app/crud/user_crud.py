@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from app.schemas.user_schema import UserCreate
+from ..schemas.schemas import UserCreate
 from app.models.user import User
 from fastapi import HTTPException
 

@@ -1,8 +1,8 @@
-def test_create_board(client):
+def test_create_board(client, user_data):
     board_data = {
         "title": "Board Title",
         "description": "Board Description",
-        "owner_id": 1
+        "owner_id": user_data.id
     }
 
     response = client.post("/boards", json=board_data)
@@ -21,10 +21,13 @@ def test_read_board_by_id(client, board_data):
     board = response.json()
 
     assert response.status_code == 200
-    assert response.json()["id"] == board_id
-    assert "title" in board
-    assert "description" in board
-    assert "owner_id" in board
+    assert board["id"] == board_id
+    assert board["title"] == board_data.title
+    assert board["description"] == board_data.description
+    # Ensure that the owner information is included
+    assert "owner" in board
+    assert board["owner"] is not None
+    assert "username" in board["owner"]
 
 
 def test_update_board(client, board_data):

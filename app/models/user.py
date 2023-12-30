@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
 
 
 class User(SQLModel, table=True):
@@ -8,3 +8,7 @@ class User(SQLModel, table=True):
     email: str
     # this will later be replaced by hashed password
     password: str
+
+    # Relationship to Board
+    boards: list["Board"] = Relationship(back_populates="owner")
+
