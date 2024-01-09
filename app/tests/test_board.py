@@ -13,6 +13,21 @@ def test_create_board(client, user_data):
     assert response.json()["owner_id"] == board_data["owner_id"]
     assert "id" in response.json()
 
+def test_create_board_with_nonexistent_user(client):
+    # Using a random or non-existent user ID
+    nonexistent_user_id = 99999  # This should be an ID that doesn't exist in your user table
+
+    # Board data with the non-existent user ID
+    board_data = {
+        "title": "Board Title",
+        "description": "Board Description",
+        "owner_id": nonexistent_user_id
+    }
+
+    response = client.post("/boards", json=board_data)
+
+    # Assert that the board creation fails due to non-existent user
+    assert response.status_code != 200
 
 def test_read_board_by_id(client, board_data):
     board_id = board_data.id

@@ -1,9 +1,14 @@
 from sqlmodel import Session, select
 from ..schemas.schemas import BoardCreate, BoardUpdate
 from ..models.board import Board
+from ..models.user import User
 from fastapi import HTTPException
 def create_board(db: Session, board: BoardCreate):
-    # setting the owner_id to one currently, later will be replaced by real user id
+    # Check if the user exists
+    user_exists = db.exec(select(User).where(User.id == board.owner_id)).first() is not None
+    if not user_exists:
+        raise HTTPException(status_code=400, detail=f"User with id of {board.owner_id} not available")
+
     try:
         db_board = Board(title=board.title, description=board.description, owner_id=board.owner_id)
         db.add(db_board)
