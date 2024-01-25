@@ -43,6 +43,21 @@ class UserRead(UserBase):
     id: int
 
 
+## BoardList Schemas
+class BoardList(BaseModel):
+    """Base class for other list schemas"""
+    title: str
+    description: str
+    board_id: int
+
+class BoardListCreate(BoardList):
+    """Fields needed when creating a board lists"""
+    pass
+
+class BoardListRead(BoardList):
+    """Fields returned when reading board lists"""
+    id: int
+
 # Relationships
 class UserReadWithBoard(UserBase):
     boards: list[BoardRead] = []
