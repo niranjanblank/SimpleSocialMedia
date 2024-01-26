@@ -11,3 +11,5 @@ class Board(SQLModel, table=True):
     # Relationship to User
     owner: 'User' = Relationship(back_populates="boards")
 
+    # Relationship to BoardList
+    board_lists: list["BoardList"] = Relationship(back_populates="board")
