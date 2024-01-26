@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 from ..models.user import User
 from ..models.board import Board
+from ..models.board_lists import BoardList
 
 load_dotenv()
 
@@ -85,3 +86,19 @@ def create_test_boards(test_db_session, create_test_users):
     test_db_session.add_all(boards)
     test_db_session.commit()
     return boards
+
+
+# Fixture to add lists to the board
+@pytest.fixture(scope="function")
+def board_list_data(test_db_session, board_data):
+    test_board_lists = [
+        BoardList(board_id=board_data.id, title="List 1", description="Description for list 1"),
+        BoardList(board_id=board_data.id, title="List 2", description="Description for list 2"),
+        # Add more board lists as needed
+    ]
+
+    for board_list in test_board_lists:
+        test_db_session.add(board_list)
+    test_db_session.commit()
+
+    return test_board_lists
