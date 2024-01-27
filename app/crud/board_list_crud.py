@@ -53,3 +53,15 @@ def get_board_lists_by_board_id(db: Session, board_id: int):
         # Handle unexpected errors
         # Log the error or handle it as needed
         raise HTTPException(status_code=500, detail=f"An error occurred while getting Board Lists: {e}")
+
+def delete_board_lists_by_id(db: Session, board_list_id):
+    """ Delete board list by id"""
+    try:
+        db_board_list = db.get(BoardList, board_list_id)
+        if not db_board_list:
+            raise HTTPException(status_code=404, detail="List not found")
+        db.delete(db_board_list)
+        db.commit()
+        return {"deleted": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred in list deletion: {e}")
