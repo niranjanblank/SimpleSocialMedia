@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 from ..database import get_session
-from ..crud.board_list_crud import create_board_list, get_board_lists_by_board_id
+from ..crud.board_list_crud import create_board_list, get_board_lists_by_board_id, delete_board_lists_by_id
 from ..schemas.schemas import BoardListRead, BoardListCreate
 router = APIRouter()
 
@@ -14,3 +14,8 @@ def create_board_list_endpoint(board_list: BoardListCreate, db: Session = Depend
 def get_board_lists_by_board_id_endpoint(board_id: int, db: Session = Depends(get_session)):
     db_board_lists = get_board_lists_by_board_id(db, board_id)
     return db_board_lists
+
+@router.delete("/board_list/{board_id}")
+def delete_board_list_by_id_endpoint(board_id:int , db: Session = Depends(get_session)):
+    result = delete_board_lists_by_id(db, board_id)
+    return result

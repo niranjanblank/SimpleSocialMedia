@@ -62,6 +62,15 @@ def board_data(test_db_session: Session, user_data: User):
     test_db_session.refresh(test_board)  # Refresh to load any additional attributes
     return test_board
 
+@pytest.fixture(scope="function")
+def board_list_data_single(test_db_session: Session, board_data: Board):
+    # Create a test board list with board_id from board_data
+
+    test_board_list = BoardList(board_id=board_data.id, title="List 1", description="Description for list 1")
+    test_db_session.add(test_board_list)
+    test_db_session.commit()
+    test_db_session.refresh(test_board_list)  # Refresh to load any additional attributes
+    return test_board_list
 
 # Fixture to create users in the database
 @pytest.fixture(scope="function")
@@ -102,3 +111,4 @@ def board_list_data(test_db_session, board_data):
     test_db_session.commit()
 
     return test_board_lists
+

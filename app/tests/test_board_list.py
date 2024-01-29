@@ -25,3 +25,14 @@ def test_get_board_lists_by_board_id(client, board_data, board_list_data):
     assert response.status_code == 200
     assert isinstance(board_lists, list)
     assert len(board_lists) == len(board_list_data)
+
+
+def test_delete_board_list_by_board_id(client, board_list_data_single):
+
+    # Test the deletion
+    delete_response = client.delete(f"/board_list/{board_list_data_single.id}")
+    assert delete_response.status_code == 200
+
+    # check if the deleted board still exist
+    get_response = client.get(f"/board_list/{board_list_data_single.id}")
+    assert get_response.status_code == 404

@@ -41,7 +41,7 @@ def get_board_lists_by_board_id(db: Session, board_id: int):
     # check if the board exists in the database before adding list to the database
     board_exists = db.exec(select(Board).where(Board.id == board_id)).first() is not None
     if not board_exists:
-        raise HTTPException(status_code=400, detail=f"Board with id of {board_id} not available")
+        raise HTTPException(status_code=404, detail=f"Board with id of {board_id} not available")
     try:
         statement = select(BoardList).where(BoardList.board_id == board_id)
         board_list_data = db.exec(statement).all()
