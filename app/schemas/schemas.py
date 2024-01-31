@@ -50,13 +50,21 @@ class BoardList(BaseModel):
     description: str
     board_id: int
 
+
 class BoardListCreate(BoardList):
     """Fields needed when creating a board lists"""
     pass
 
+
 class BoardListRead(BoardList):
     """Fields returned when reading board lists"""
     id: int
+
+
+class BoardListUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+
 
 # Relationships
 class UserReadWithBoard(UserBase):

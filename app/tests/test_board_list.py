@@ -36,3 +36,22 @@ def test_delete_board_list_by_board_id(client, board_list_data_single):
     # check if the deleted board still exist
     get_response = client.get(f"/board_list/{board_list_data_single.id}")
     assert get_response.status_code == 404
+
+def test_board_list_update(client, board_data, board_list_data_single):
+
+    update_data = {
+        "title": "Updated List Title",
+        "description": "Updated List Description"
+    }
+
+    response = client.put(f"/board_list/{board_list_data_single.id}", json=update_data)
+
+    data = response.json()
+
+    # check if the response is received correctly
+    assert response.status_code == 200
+
+    # check if the data is updated
+    assert data["title"] == update_data["title"]
+    assert data["description"] == update_data["description"]
+

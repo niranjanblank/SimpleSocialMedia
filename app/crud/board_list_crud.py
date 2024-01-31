@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from ..schemas.schemas import BoardListCreate
+from ..schemas.schemas import BoardListCreate, BoardListUpdate
 from ..models.board import Board
 from ..models.board_lists import BoardList
 from fastapi import HTTPException
@@ -65,3 +65,6 @@ def delete_board_lists_by_id(db: Session, board_list_id):
         return {"deleted": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred in list deletion: {e}")
+
+def update_board_list(db: Session, board_list_update: BoardListUpdate):
+    pass
