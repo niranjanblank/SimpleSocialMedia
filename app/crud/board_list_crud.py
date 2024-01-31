@@ -54,6 +54,7 @@ def get_board_lists_by_board_id(db: Session, board_id: int):
         # Log the error or handle it as needed
         raise HTTPException(status_code=500, detail=f"An error occurred while getting Board Lists: {e}")
 
+
 def delete_board_lists_by_id(db: Session, board_list_id):
     """ Delete board list by id"""
     try:
@@ -66,5 +67,23 @@ def delete_board_lists_by_id(db: Session, board_list_id):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred in list deletion: {e}")
 
-def update_board_list(db: Session, board_list_update: BoardListUpdate):
-    pass
+
+def update_board_list(db: Session, board_list_id: int, board_list_update: BoardListUpdate):
+    try:
+        db_board_list = db.get(BoardList, board_list_id)
+        if not db_board_list:
+            raise HTTPException(status_code=404, detail="List not found")
+        # exclude_unset excludes any fields that have not been assigned a value
+        update_data = board_list_update.model_dump(exclude_unset=True)
+
+        for key, value in update_data.items():
+            setattr(db_board_list, key, value)
+        db.add(db_board_list)
+        db.commit()
+        db.refresh(db_board_list)
+        return db_board_list
+    except HTTPException as http_ex:
+        # Reraise the HTTPException to be handled by FastAPI
+        raise http_ex
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred in board list: {e}")

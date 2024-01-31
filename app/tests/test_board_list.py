@@ -1,4 +1,3 @@
-
 def test_create_board_list(client, board_data):
     board_list_data = {
         "board_id": board_data.id,
@@ -16,6 +15,7 @@ def test_create_board_list(client, board_data):
     assert response.json()["board_id"] == board_list_data["board_id"]
     assert "id" in response.json()
 
+
 def test_get_board_lists_by_board_id(client, board_data, board_list_data):
     # Test the get_board_lists_by_board_id endpoint
     response = client.get(f"/board_list/{board_data.id}")
@@ -28,7 +28,6 @@ def test_get_board_lists_by_board_id(client, board_data, board_list_data):
 
 
 def test_delete_board_list_by_board_id(client, board_list_data_single):
-
     # Test the deletion
     delete_response = client.delete(f"/board_list/{board_list_data_single.id}")
     assert delete_response.status_code == 200
@@ -37,8 +36,8 @@ def test_delete_board_list_by_board_id(client, board_list_data_single):
     get_response = client.get(f"/board_list/{board_list_data_single.id}")
     assert get_response.status_code == 404
 
-def test_board_list_update(client, board_data, board_list_data_single):
 
+def test_board_list_update(client, board_data, board_list_data_single):
     update_data = {
         "title": "Updated List Title",
         "description": "Updated List Description"
@@ -55,3 +54,23 @@ def test_board_list_update(client, board_data, board_list_data_single):
     assert data["title"] == update_data["title"]
     assert data["description"] == update_data["description"]
 
+    # update only the title
+    update_data_title = {
+        "title" : "Updating the title Only"
+    }
+
+    response = client.put(f"/board_list/{board_list_data_single.id}", json=update_data_title)
+
+    data = response.json()
+
+    # check if the response is received correctly
+    assert response.status_code == 200
+
+    # check if the data is updated
+    assert data["title"] == update_data_title["title"]
+    assert data["description"] == update_data["description"]
+
+    # updating non-existent data
+    response = client.put(f"/board_list/{9999}", json=update_data_title)
+
+    assert response.status_code == 404
