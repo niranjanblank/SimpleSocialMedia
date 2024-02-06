@@ -76,3 +76,21 @@ def read_boards(db: Session, skip: int, limit: int):
         # Handle unexpected errors
         # Log the error or handle it as needed
         raise HTTPException(status_code=500, detail=f"An error occurred while getting Boards: {e}")
+
+def read_boards_by_owner_id(db:Session, owner_id):
+    """Get all the boards by owner_id"""
+    # check if the owner exists in the database
+    owner_exists = db.exec(select(User).where(User.id == owner_id)).first() is not None
+    if not owner_exists:
+        raise HTTPException(status_code=404, detail=f"Board created by  user {owner_id} doesnt exist")
+    try:
+        statement = select(Board).where(Board.owner_id == owner_id)
+        board_data = db.exec(statement).all()
+        return board_data
+    except HTTPException as http_ex:
+        # Reraise the HTTPException to be handled by FastAPI
+        raise http_ex
+    except Exception as e:
+        # Handle unexpected errors
+        # Log the error or handle it as needed
+        raise HTTPException(status_code=500, detail=f"An error occurred while getting Board {e}")
