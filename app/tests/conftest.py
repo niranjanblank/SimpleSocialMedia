@@ -96,6 +96,16 @@ def create_test_boards(test_db_session, create_test_users):
     test_db_session.commit()
     return boards
 
+@pytest.fixture(scope="function")
+def create_board_data_single_owner(test_db_session, user_data):
+    boards = [
+        Board(title=f"Board {i}", description=f"Description {i}",
+              owner_id=user_data.id)
+        for i in range(20)  # Creating 20 test boards
+    ]
+    test_db_session.add_all(boards)
+    test_db_session.commit()
+    return boards
 
 # Fixture to add lists to the board
 @pytest.fixture(scope="function")

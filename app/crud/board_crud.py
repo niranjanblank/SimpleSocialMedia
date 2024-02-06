@@ -82,7 +82,7 @@ def read_boards_by_owner_id(db:Session, owner_id):
     # check if the owner exists in the database
     owner_exists = db.exec(select(User).where(User.id == owner_id)).first() is not None
     if not owner_exists:
-        raise HTTPException(status_code=404, detail=f"Board created by  user {owner_id} doesnt exist")
+        raise HTTPException(status_code=404, detail=f"User {owner_id} doesnt exist")
     try:
         statement = select(Board).where(Board.owner_id == owner_id)
         board_data = db.exec(statement).all()

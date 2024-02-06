@@ -95,3 +95,16 @@ def test_get_boards_pagination(client, create_test_boards):
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 0  # Expecting no boards as skip is beyond the total number of boards
+
+def test_get_boards_by_owner_id(client,user_data,create_board_data_single_owner):
+    # testing fetching
+    response = client.get(f"/boards/owner/{user_data.id}")
+    assert response.status_code == 200
+    data = response.json()
+
+    # checking if the data returned is equal to the data created in the db
+    assert len(data)==20
+
+    # checking for non-existent user
+    response = client.get(f"/boards/owner/{999999}")
+    assert response.status_code == 404
