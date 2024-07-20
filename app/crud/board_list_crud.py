@@ -11,7 +11,7 @@ def create_board_list(db: Session, board_list: BoardListCreate):
     if not board_exists:
         raise HTTPException(status_code=400, detail=f"Board with id of {board_list.board_id} not available")
     try:
-        db_board_list = BoardList(title=board_list.title, description=board_list.description,
+        db_board_list = BoardList(title=board_list.title,
                                   board_id=board_list.board_id)
         db.add(db_board_list)
         db.commit()

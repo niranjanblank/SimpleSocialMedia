@@ -2,7 +2,6 @@ def test_create_board_list(client, board_data):
     board_list_data = {
         "board_id": board_data.id,
         "title": "Title For List",
-        "description": "desc for the title of list in board"
     }
 
     # Send a POST request to the board_list creation endpoint
@@ -11,7 +10,6 @@ def test_create_board_list(client, board_data):
     # Assertions to ensure the board list was created successfully
     assert response.status_code == 200
     assert response.json()["title"] == board_list_data["title"]
-    assert response.json()["description"] == board_list_data["description"]
     assert response.json()["board_id"] == board_list_data["board_id"]
     assert "id" in response.json()
 
@@ -40,7 +38,6 @@ def test_delete_board_list_by_board_id(client, board_list_data_single):
 def test_board_list_update(client, board_data, board_list_data_single):
     update_data = {
         "title": "Updated List Title",
-        "description": "Updated List Description"
     }
 
     response = client.put(f"/board_list/{board_list_data_single.id}", json=update_data)
@@ -52,7 +49,6 @@ def test_board_list_update(client, board_data, board_list_data_single):
 
     # check if the data is updated
     assert data["title"] == update_data["title"]
-    assert data["description"] == update_data["description"]
 
     # update only the title
     update_data_title = {
@@ -68,7 +64,6 @@ def test_board_list_update(client, board_data, board_list_data_single):
 
     # check if the data is updated
     assert data["title"] == update_data_title["title"]
-    assert data["description"] == update_data["description"]
 
     # updating non-existent data
     response = client.put(f"/board_list/{9999}", json=update_data_title)

@@ -47,7 +47,6 @@ class UserRead(UserBase):
 class BoardList(BaseModel):
     """Base class for other list schemas"""
     title: str
-    description: str
     board_id: int
 
 
@@ -63,7 +62,6 @@ class BoardListRead(BoardList):
 
 class BoardListUpdate(BaseModel):
     title: str | None = None
-    description: str | None = None
 
 
 # Relationships
