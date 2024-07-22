@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.database import create_db_and_tables
-from .routers import user_router, board_router, board_list_router
+from .routers import user_router, board_router, board_list_router, list_card_router
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -25,3 +25,4 @@ app.add_middleware(
 app.include_router(user_router.router)
 app.include_router(board_router.router)
 app.include_router(board_list_router.router)
+app.include_router(list_card_router.router)

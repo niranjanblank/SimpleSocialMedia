@@ -11,6 +11,6 @@ class BoardList(SQLModel, table=True):
     board: 'Board' = Relationship(back_populates="board_lists")
 
     # relationship with list_card
-    list_cards: list["BoardList"] = Relationship(back_populates="belongs_to_list", cascade_delete=True)
+    list_cards: list["ListCard"] = Relationship(back_populates="belongs_to_list", cascade_delete=True)
 
 

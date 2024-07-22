@@ -76,8 +76,7 @@ class BoardReadWithOwner(BoardBase):
 
 ## ListCard Schemas
 class ListCardBase(BaseModel):
-    """Base class for the cards in a lits"""
-    id:int
+    """Base class for the cards in a lists"""
     title: str
     desc: str
     list_id: int
@@ -89,5 +88,6 @@ class ListCardCreate(ListCardBase):
 
 class ListCardRead(ListCardBase):
     """ Attributes returned when reading list card """
+    id: int
     pass
 
