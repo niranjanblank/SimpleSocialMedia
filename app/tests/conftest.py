@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from ..models.user import User
 from ..models.board import Board
 from ..models.board_lists import BoardList
+from ..models.list_card import ListCard
 
 load_dotenv()
 
@@ -113,7 +114,7 @@ def board_list_data(test_db_session, board_data):
     test_board_lists = [
         BoardList(board_id=board_data.id, title="List 1", description="Description for list 1"),
         BoardList(board_id=board_data.id, title="List 2", description="Description for list 2"),
-        # Add more board lists as needed
+
     ]
 
     for board_list in test_board_lists:
@@ -121,4 +122,22 @@ def board_list_data(test_db_session, board_data):
     test_db_session.commit()
 
     return test_board_lists
+
+# Fixture to add cards to a list
+@pytest.fixture(scope="function")
+def list_card_data(test_db_session, board_list_data):
+    # add multiple cards to list
+    list_cards = [
+        ListCard(title="Card 1", desc="Description for card 1", list_id=board_list_data[0].id),
+        ListCard(title="Card 2", desc="Description for card 2", list_id=board_list_data[0].id),
+        ListCard(title="Card 3", desc="Description for card 3", list_id=board_list_data[0].id),
+    ]
+
+    for list_card in list_cards:
+        test_db_session.add(list_card)
+    test_db_session.commit()
+
+    return list_cards
+
+
 
