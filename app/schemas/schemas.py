@@ -73,3 +73,21 @@ class UserReadWithBoard(UserBase):
 class BoardReadWithOwner(BoardBase):
     id: int
     owner: UserRead
+
+## ListCard Schemas
+class ListCardBase(BaseModel):
+    """Base class for the cards in a lits"""
+    id:int
+    title: str
+    desc: str
+    list_id: int
+
+class ListCardCreate(ListCardBase):
+    """ Attributes required to create a card in a list """
+    pass
+
+
+class ListCardRead(ListCardBase):
+    """ Attributes returned when reading list card """
+    pass
+

@@ -13,4 +13,4 @@ class Board(SQLModel, table=True):
 
     # Relationship to BoardList
     # cascade delete, when a board is deleted, all the lists inside this board will be deleted
-    board_lists: list["BoardList"] = Relationship(back_populates="board", sa_relationship_kwargs={"cascade": "delete"})
+    board_lists: list["BoardList"] = Relationship(back_populates="board", cascade_delete=True)
