@@ -6,7 +6,7 @@ class User(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     username: str = Field(index=True)
     email: str
-    # this will later be replaced by hashed password
+    # this is hashed password
     password: str
 
     # Relationship to Board

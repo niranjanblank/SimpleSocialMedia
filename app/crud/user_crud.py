@@ -2,11 +2,16 @@ from sqlmodel import Session, select
 from ..schemas.schemas import UserCreate
 from app.models.user import User
 from fastapi import HTTPException
-
+from ..auth import get_password_hash
 
 def create_user(db: Session, user: UserCreate):
     try:
-        db_user = User(username=user.username, email=user.email, password=user.password)
+        # Check if the username already exists
+        existing_user = db.exec(select(User).where(User.username == user.username)).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already taken")
+        hashed_password = get_password_hash(user.password)
+        db_user = User(username=user.username, email=user.email, password=hashed_password)
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
