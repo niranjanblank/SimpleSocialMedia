@@ -55,7 +55,7 @@ def authenticate_user(db_session: Session, username:str, password:str):
     Authenticate a user by username and password
     """
     user = get_user(db_session, username)
-    if not User or not verify_password(password, user.password):
+    if not user or not verify_password(password, user.password):
         return None
     return user
 

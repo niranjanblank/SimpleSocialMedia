@@ -4,7 +4,8 @@ from ..schemas.schemas import UserRead, UserCreate, UserReadWithBoard, Token
 from ..crud.user_crud import create_user, get_user_by_id, read_users
 from ..database import get_session
 from fastapi.security import OAuth2PasswordRequestForm
-from ..auth import authenticate_user, create_access_token
+from ..auth import authenticate_user, create_access_token, get_current_active_user
+from ..models.user import User
 
 router = APIRouter()
 
@@ -16,7 +17,7 @@ def create_user_endpoint(user: UserCreate, db: Session = Depends(get_session)):
 
 
 @router.get("/users/{user_id}", response_model=UserReadWithBoard)
-def read_user_by_id(user_id: int, db: Session = Depends(get_session)):
+def read_user_by_id(user_id: int, db: Session = Depends(get_session),current_user: User = Depends(get_current_active_user)):
     db_user = get_user_by_id(db, user_id)
     return db_user
 
@@ -26,7 +27,7 @@ def read_users_endpoint(skip: int = Query(0, ge=0), limit: int = Query(10, gt=0)
     db_users = read_users(db, skip=skip, limit=limit)
     return db_users
 
-@router.post("/login", response_model=Token)
+@router.post("/token", response_model=Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_session)):
     """
     User login endpoint. Returns a JWT token if the credentials are correct.
