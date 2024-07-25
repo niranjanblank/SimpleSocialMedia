@@ -27,20 +27,3 @@ def read_users_endpoint(skip: int = Query(0, ge=0), limit: int = Query(10, gt=0)
     db_users = read_users(db, skip=skip, limit=limit)
     return db_users
 
-@router.post("/token", response_model=Token)
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_session)):
-    """
-    User login endpoint. Returns a JWT token if the credentials are correct.
-    """
-
-    # Authenticate the userr
-    user = authenticate_user(db, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    access_token = create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
