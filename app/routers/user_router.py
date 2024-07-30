@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query, HTTPException, status
 from sqlmodel import Session
 from ..schemas.schemas import UserRead, UserCreate, UserReadWithBoard, Token
-from ..crud.user_crud import create_user, get_user_by_id, read_users
+from ..crud.user_crud import create_user, get_user_by_id, read_users, get_user_by_username
 from ..database import get_session
 from fastapi.security import OAuth2PasswordRequestForm
 from ..auth import authenticate_user, create_access_token, get_current_active_user
@@ -17,8 +17,13 @@ def create_user_endpoint(user: UserCreate, db: Session = Depends(get_session)):
 
 
 @router.get("/users/{user_id}", response_model=UserReadWithBoard)
-def read_user_by_id(user_id: int, db: Session = Depends(get_session),current_user: User = Depends(get_current_active_user)):
+def get_user_by_username(user_id: int, db: Session = Depends(get_session)):
     db_user = get_user_by_id(db, user_id)
+    return db_user
+
+@router.get("/users/details/{username}", response_model=UserReadWithBoard)
+def read_user_by_id(username: str, db: Session = Depends(get_session),current_user: User = Depends(get_current_active_user)):
+    db_user = get_user_by_username(db, username)
     return db_user
 
 

@@ -24,7 +24,9 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(data={"sub": user.username})
+    access_token = create_access_token(
+        data={"sub": user.username, "user_id": user.id}
+    )
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/verify-token")
