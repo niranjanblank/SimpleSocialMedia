@@ -9,7 +9,7 @@ from fastapi import Depends, HTTPException, status
 import jwt
 from .database import get_session
 from .schemas.schemas import TokenData, Token
-
+from fastapi import Request
 from dotenv import load_dotenv
 import os
 
@@ -72,7 +72,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db_session: Session = Depends(get_session)):
+async def get_current_user(request: Request, db_session: Session = Depends(get_session)):
     """
     Get the current user from the JWT token.
     """
@@ -81,6 +81,16 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db_session: Sess
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    # Try to retrieve the token from the cookies
+    token = request.cookies.get('access_token')
+    if token is None:
+        # Try to retrieve the token from the Authorization header
+        auth_header = request.headers.get("Authorization")
+        if auth_header:
+            try:
+                token = auth_header.split(" ")[1]
+            except IndexError:
+                raise credentials_exception
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -92,6 +102,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db_session: Sess
     except jwt.PyJWTError:
         raise credentials_exception
     user = get_user(db_session, username=token_data.username)
+    # Retrieve the user from the database using the username
     if user is None:
         raise credentials_exception
     return user

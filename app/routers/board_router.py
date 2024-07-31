@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from ..schemas.schemas import BoardRead, BoardCreate, BoardUpdate, BoardReadWithOwner
+from ..models.user import User
+from ..auth import get_current_active_user
 from ..crud.board_crud import create_board, update_board, read_board_by_id, delete_board, read_boards, read_boards_by_owner_id
 from ..database import get_session
 from sqlmodel import Session
@@ -7,9 +9,9 @@ from ..models.board import Board
 
 router = APIRouter()
 
-
+# current_user authenticates the route, if not authenticated the route doesnt work
 @router.post("/boards", response_model=BoardReadWithOwner)
-def create_board_endpoint(board: BoardCreate, db: Session = Depends(get_session)):
+def create_board_endpoint(board: BoardCreate, db: Session = Depends(get_session), current_user: User = Depends(get_current_active_user)):
     db_board = create_board(db, board)
     return db_board
 
