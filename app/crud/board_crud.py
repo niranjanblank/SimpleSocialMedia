@@ -94,3 +94,4 @@ def read_boards_by_owner_id(db:Session, owner_id):
         # Handle unexpected errors
         # Log the error or handle it as needed
         raise HTTPException(status_code=500, detail=f"An error occurred while getting Board {e}")
+

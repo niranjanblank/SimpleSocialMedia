@@ -64,16 +64,6 @@ class BoardListUpdate(BaseModel):
     title: str | None = None
 
 
-# Relationships
-class UserReadWithBoard(UserBase):
-    boards: list[BoardRead] = []
-    id: int
-
-
-class BoardReadWithOwner(BoardBase):
-    id: int
-    owner: UserRead
-
 ## ListCard Schemas
 class ListCardBase(BaseModel):
     """Base class for the cards in a lists"""
@@ -100,4 +90,19 @@ class TokenData(BaseModel):
     username: str
     user_id: int
 
+# Relationships
+class UserReadWithBoard(UserBase):
+    boards: list[BoardRead] = []
+    id: int
+
+
+class BoardReadWithOwner(BoardBase):
+    id: int
+    owner: UserRead
+
+class BoardListWithCards(BoardListRead):
+    list_cards: list[ListCardRead]=[]
+
+class BoardReadWithListAndCard(BoardBase):
+    board_lists: list[BoardListWithCards] = []
 
