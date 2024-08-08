@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import Session, select
-from typing import Optional
+from typing import Optional, Annotated
 from .models.user import User
 from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException, status
@@ -12,6 +12,7 @@ from .schemas.schemas import TokenData, Token
 from fastapi import Request
 from dotenv import load_dotenv
 import os
+from jwt import PyJWTError, ExpiredSignatureError
 
 # Load environment variables from .env file
 load_dotenv()
@@ -70,27 +71,27 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp":expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    print(f"Generated JWT: {encoded_jwt}")
     return encoded_jwt
 
 async def get_current_user(request: Request, db_session: Session = Depends(get_session)):
-    """
-    Get the current user from the JWT token.
-    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    # Try to retrieve the token from the cookies
+
     token = request.cookies.get('access_token')
     if token is None:
-        # Try to retrieve the token from the Authorization header
         auth_header = request.headers.get("Authorization")
         if auth_header:
             try:
                 token = auth_header.split(" ")[1]
             except IndexError:
                 raise credentials_exception
+
+    if token is None:
+        raise credentials_exception
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -99,14 +100,22 @@ async def get_current_user(request: Request, db_session: Session = Depends(get_s
         if username is None or user_id is None:
             raise credentials_exception
         token_data = TokenData(username=username, user_id=user_id)
-    except jwt.PyJWTError:
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except PyJWTError:
         raise credentials_exception
+
     user = get_user(db_session, username=token_data.username)
-    # Retrieve the user from the database using the username
     if user is None:
         raise credentials_exception
+
     return user
 
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
+async def get_current_active_user(current_user: Annotated[User, Depends(get_current_user)]):
     return current_user
+
 

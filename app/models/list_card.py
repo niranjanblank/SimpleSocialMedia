@@ -5,6 +5,8 @@ class ListCard(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     title: str
     desc: str
+    order: int
+
     list_id : int = Field(foreign_key="lists.id")
 
     # Relationship to the board_list

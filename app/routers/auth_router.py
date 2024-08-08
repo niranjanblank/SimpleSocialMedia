@@ -4,8 +4,8 @@ from ..schemas.schemas import Token
 from ..database import get_session
 from fastapi.security import OAuth2PasswordRequestForm
 from ..auth import authenticate_user, create_access_token, get_current_active_user,oauth2_scheme
-
-
+from typing import Annotated
+from ..models.user import User
 router = APIRouter()
 
 
@@ -30,8 +30,5 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/verify-token")
-async def verify_token(token: str = Depends(oauth2_scheme), db_session: Session = Depends(get_session)):
-    user = await get_current_active_user()
-    if user:
-        return {"status": "ok"}
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+async def verify_token(current_user: Annotated[User, Depends(get_current_active_user)]):
+    return {"status": "ok", "username": current_user.username, "user_id": current_user.id}

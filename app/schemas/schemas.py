@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-
+from typing import Optional
 
 ## Board Schemas
 class BoardBase(BaseModel):
@@ -48,6 +48,7 @@ class BoardList(BaseModel):
     """Base class for other list schemas"""
     title: str
     board_id: int
+    order: Optional[int] = None
 
 
 class BoardListCreate(BoardList):
@@ -70,6 +71,7 @@ class ListCardBase(BaseModel):
     title: str
     desc: str
     list_id: int
+    order: Optional[int] = None
 
 class ListCardCreate(ListCardBase):
     """ Attributes required to create a card in a list """
@@ -103,6 +105,6 @@ class BoardReadWithOwner(BoardBase):
 class BoardListWithCards(BoardListRead):
     list_cards: list[ListCardRead]=[]
 
-class BoardReadWithListAndCard(BoardBase):
+class BoardReadWithListAndCard(BoardRead):
     board_lists: list[BoardListWithCards] = []
 

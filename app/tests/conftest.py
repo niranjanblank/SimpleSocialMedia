@@ -67,7 +67,7 @@ def board_data(test_db_session: Session, user_data: User):
 def board_list_data_single(test_db_session: Session, board_data: Board):
     # Create a test board list with board_id from board_data
 
-    test_board_list = BoardList(board_id=board_data.id, title="List 1", description="Description for list 1")
+    test_board_list = BoardList(board_id=board_data.id, title="List 1", description="Description for list 1",order=1)
     test_db_session.add(test_board_list)
     test_db_session.commit()
     test_db_session.refresh(test_board_list)  # Refresh to load any additional attributes
@@ -112,9 +112,8 @@ def create_board_data_single_owner(test_db_session, user_data):
 @pytest.fixture(scope="function")
 def board_list_data(test_db_session, board_data):
     test_board_lists = [
-        BoardList(board_id=board_data.id, title="List 1", description="Description for list 1"),
-        BoardList(board_id=board_data.id, title="List 2", description="Description for list 2"),
-
+        BoardList(board_id=board_data.id, title="List 1", description="Description for list 1", order=0),
+        BoardList(board_id=board_data.id, title="List 2", description="Description for list 2", order=1),
     ]
 
     for board_list in test_board_lists:
@@ -128,9 +127,9 @@ def board_list_data(test_db_session, board_data):
 def list_card_data(test_db_session, board_list_data):
     # add multiple cards to list
     list_cards = [
-        ListCard(title="Card 1", desc="Description for card 1", list_id=board_list_data[0].id),
-        ListCard(title="Card 2", desc="Description for card 2", list_id=board_list_data[0].id),
-        ListCard(title="Card 3", desc="Description for card 3", list_id=board_list_data[0].id),
+        ListCard(title="Card 1", desc="Description for card 1", list_id=board_list_data[0].id, order=0),
+        ListCard(title="Card 2", desc="Description for card 2", list_id=board_list_data[0].id, order=1),
+        ListCard(title="Card 3", desc="Description for card 3", list_id=board_list_data[0].id, order=2),
     ]
 
     for list_card in list_cards:
@@ -138,6 +137,5 @@ def list_card_data(test_db_session, board_list_data):
     test_db_session.commit()
 
     return list_cards
-
 
 
