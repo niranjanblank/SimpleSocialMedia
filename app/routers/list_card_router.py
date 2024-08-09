@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends
-from ..schemas.schemas import ListCardRead, ListCardCreate
+from ..schemas.schemas import ListCardRead, ListCardCreate, ListCardUpdate
 from sqlmodel import Session
 from ..database import get_session
-from ..crud.list_card_crud import create_list_card, read_list_card_by_list_id, find_highest_order_card_in_list
+from ..crud.list_card_crud import create_list_card, read_list_card_by_list_id, \
+    find_highest_order_card_in_list, update_list_card
 
 router = APIRouter()
 
@@ -21,3 +22,9 @@ def get_list_card_by_list_id_endpoint(list_id: int, db: Session = Depends(get_se
 def find_highest_order_card_in_list_endpoint(list_id: int, db: Session = Depends(get_session)):
     highest_order_card = find_highest_order_card_in_list(db, list_id)
     return highest_order_card
+
+@router.put("/list_card/{list_card_id}")
+def update_list_card_endpoint(list_card_id: int, card_update: ListCardUpdate,
+                              db: Session = Depends(get_session)):
+    db_card = update_list_card(db,list_card_id,card_update)
+    return db_card

@@ -63,7 +63,7 @@ class BoardListRead(BoardList):
 
 class BoardListUpdate(BaseModel):
     title: str | None = None
-
+    order: int | None = None
 
 ## ListCard Schemas
 class ListCardBase(BaseModel):
@@ -82,6 +82,13 @@ class ListCardRead(ListCardBase):
     """ Attributes returned when reading list card """
     id: int
     pass
+
+class ListCardUpdate(BaseModel):
+    """ Attributes returned when updating list card """
+    title: str | None = None
+    desc: str | None = None
+    list_id: int | None = None
+    order: int | None = None
 
 # for jwt
 class Token(BaseModel):

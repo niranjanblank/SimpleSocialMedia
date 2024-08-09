@@ -1,4 +1,4 @@
-from ..schemas.schemas import ListCardCreate
+from ..schemas.schemas import ListCardCreate, ListCardUpdate
 from sqlmodel import Session,select
 from ..models.board_lists import BoardList
 from ..models.list_card import ListCard
@@ -78,3 +78,26 @@ def find_highest_order_card_in_list(db: Session, list_id: int):
         # Handle unexpected errors
         # Log the error or handle it as needed
         raise HTTPException(status_code=500, detail=f"An error occurred while finding the highest order card: {e}")
+
+def update_list_card(db: Session, list_card_id: int, card_update: ListCardUpdate):
+    """
+    Update the list card based on the data given
+    """
+    try:
+        db_card = db.get(ListCard, list_card_id)
+        if not db_card:
+            raise HTTPException(status_code=404, detail="Card not found")
+        # exclude_unset excludes any fields that have not been assigned a value
+        update_data = card_update.model_dump(exclude_unset=True)
+
+        for key, value in update_data.items():
+            setattr(db_card, key, value)
+        db.add(db_card)
+        db.commit()
+        db.refresh(db_card)
+        return db_card
+    except HTTPException as http_ex:
+        # Reraise the HTTPException to be handled by FastAPI
+        raise http_ex
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred in card: {e}")
