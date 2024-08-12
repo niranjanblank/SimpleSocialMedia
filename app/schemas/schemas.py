@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 ## Board Schemas
 class BoardBase(BaseModel):
@@ -72,6 +73,9 @@ class ListCardBase(BaseModel):
     desc: str
     list_id: int
     order: Optional[int] = None
+    created_at: datetime | None = None
+    due_date: datetime | None = None
+    updated_at: datetime | None = None
 
 class ListCardCreate(ListCardBase):
     """ Attributes required to create a card in a list """
@@ -89,6 +93,7 @@ class ListCardUpdate(BaseModel):
     desc: str | None = None
     list_id: int | None = None
     order: int | None = None
+    due_date: datetime | None = None
 
 # for jwt
 class Token(BaseModel):
@@ -115,3 +120,5 @@ class BoardListWithCards(BoardListRead):
 class BoardReadWithListAndCard(BoardRead):
     board_lists: list[BoardListWithCards] = []
 
+class ListCardWithList(ListCardRead):
+    belongs_to_list: BoardList

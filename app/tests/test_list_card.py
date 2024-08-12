@@ -87,3 +87,36 @@ def test_update_nonexistent_card(client):
     assert response.status_code == 404
     data = response.json()
     assert data["detail"] == "Card not found"
+
+def test_delete_list_card(client, list_card_data):
+    """ Test for deleting a card from a list """
+    # Use the first card from the fixture to delete
+    card_to_delete = list_card_data[0]
+
+    # Perform the DELETE request to delete the card
+    response = client.delete(f"/list_card/{card_to_delete.id}")
+
+    # Ensure the request was successful
+    assert response.status_code == 200
+
+    # Check the response to ensure the card was deleted
+    data = response.json()
+    assert data == {"deleted": True}
+
+    # Attempt to retrieve the deleted card to ensure it no longer exists
+    response = client.get(f"/list_card/{card_to_delete.id}")
+    assert response.status_code == 404
+    data = response.json()
+    assert data["detail"] == f"No cards with id {card_to_delete.id}"
+
+
+def test_delete_nonexistent_card(client):
+    """ Test for deleting a non-existent card """
+    # Attempt to delete a card with an ID that doesn't exist
+    response = client.delete("/list_card/9999")  # Assuming 9999 is a non-existent ID
+
+    # Ensure the request fails with a 404
+    assert response.status_code == 404
+    data = response.json()
+    assert data["detail"] == "Card not found"
+

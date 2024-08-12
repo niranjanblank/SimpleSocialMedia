@@ -3,7 +3,7 @@ from sqlmodel import Session,select
 from ..models.board_lists import BoardList
 from ..models.list_card import ListCard
 from fastapi import HTTPException
-
+from datetime import datetime
 
 #  Create card in a list
 def create_list_card(db: Session, list_card: ListCardCreate):
@@ -37,6 +37,24 @@ def create_list_card(db: Session, list_card: ListCardCreate):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"An error occurred in board creation: {e}")
 
+
+def read_list_card_by_id(db: Session, list_card_id: int):
+    try:
+        # Query to find the card
+        statement = select(ListCard).where(ListCard.id == list_card_id)
+        db_card = db.exec(statement).first()
+
+        if db_card is None:
+            raise HTTPException(status_code=404, detail=f"No cards with id {list_card_id}")
+
+        return db_card
+    except HTTPException as http_ex:
+        # Reraise the HTTPException to be handled by FastAPI
+        raise http_ex
+    except Exception as e:
+        # Handle unexpected errors
+        # Log the error or handle it as needed
+        raise HTTPException(status_code=500, detail=f"An error occurred while finding the card: {e}")
 
 # read all the card in a list by list_id
 def read_list_card_by_list_id(db:Session, list_id: int):
@@ -92,6 +110,10 @@ def update_list_card(db: Session, list_card_id: int, card_update: ListCardUpdate
 
         for key, value in update_data.items():
             setattr(db_card, key, value)
+
+        # Update the updated_at field
+        db_card.updated_at = datetime.utcnow()
+
         db.add(db_card)
         db.commit()
         db.refresh(db_card)
@@ -101,3 +123,18 @@ def update_list_card(db: Session, list_card_id: int, card_update: ListCardUpdate
         raise http_ex
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred in card: {e}")
+
+def delete_card_by_id(db: Session, list_card_id):
+    """ Delete card list by id"""
+    try:
+        db_card = db.get(ListCard, list_card_id)
+        if not db_card:
+            raise HTTPException(status_code=404, detail="Card not found")
+        db.delete(db_card)
+        db.commit()
+        return {"deleted": True}
+    except HTTPException as http_ex:
+        # Reraise the HTTPException to be handled by FastAPI
+        raise http_ex
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred in card deletion: {e}")
