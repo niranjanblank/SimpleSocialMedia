@@ -76,6 +76,7 @@ class ListCardBase(BaseModel):
     created_at: datetime | None = None
     due_date: datetime | None = None
     updated_at: datetime | None = None
+    completed: bool | None = None
 
 class ListCardCreate(ListCardBase):
     """ Attributes required to create a card in a list """
@@ -94,6 +95,7 @@ class ListCardUpdate(BaseModel):
     list_id: int | None = None
     order: int | None = None
     due_date: datetime | None = None
+    completed: bool | None = None
 
 # for jwt
 class Token(BaseModel):

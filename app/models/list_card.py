@@ -8,6 +8,8 @@ class ListCard(SQLModel, table=True):
     title: str
     desc: str
     order: int
+    completed: bool = Field(default=False)
+
 
     # date attributes
     created_at: datetime = Field(default_factory=datetime.utcnow)
