@@ -7,6 +7,7 @@ class Board(SQLModel, table=True):
     title: str
     description: str
     owner_id: int = Field(foreign_key="users.id")
+    background_image_url: str | None = None
 
     # Relationship to User
     owner: 'User' = Relationship(back_populates="boards")

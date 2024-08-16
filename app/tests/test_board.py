@@ -1,3 +1,6 @@
+from unittest.mock import patch
+
+
 def test_create_board(client, user_data):
     board_data = {
         "title": "Board Title",
@@ -12,6 +15,7 @@ def test_create_board(client, user_data):
     assert response.json()["description"] == board_data["description"]
     assert response.json()["owner_id"] == board_data["owner_id"]
     assert "id" in response.json()
+
 
 def test_create_board_with_nonexistent_user(client):
     # Using a random or non-existent user ID
@@ -28,6 +32,7 @@ def test_create_board_with_nonexistent_user(client):
 
     # Assert that the board creation fails due to non-existent user
     assert response.status_code != 200
+
 
 def test_read_board_by_id(client, board_data):
     board_id = board_data.id
@@ -96,15 +101,44 @@ def test_get_boards_pagination(client, create_test_boards):
     data = response.json()
     assert len(data) == 0  # Expecting no boards as skip is beyond the total number of boards
 
-def test_get_boards_by_owner_id(client,user_data,create_board_data_single_owner):
+
+def test_get_boards_by_owner_id(client, user_data, create_board_data_single_owner):
     # testing fetching
     response = client.get(f"/boards/owner/{user_data.id}")
     assert response.status_code == 200
     data = response.json()
 
     # checking if the data returned is equal to the data created in the db
-    assert len(data)==20
+    assert len(data) == 20
 
     # checking for non-existent user
     response = client.get(f"/boards/owner/{999999}")
     assert response.status_code == 404
+
+
+# Mock data to simulate S3 response
+MOCK_S3_RESPONSE = [
+    "https://ticketingsystemdata.s3.ap-southeast-2.amazonaws.com/boards/template_images/image1.jpg",
+    "https://ticketingsystemdata.s3.ap-southeast-2.amazonaws.com/boards/template_images/image2.jpg",
+    "https://ticketingsystemdata.s3.ap-southeast-2.amazonaws.com/boards/template_images/image3.jpg",
+]
+
+
+# Mock function to replace `list_template_images` in your application
+def mock_list_template_images(prefix):
+    return MOCK_S3_RESPONSE
+
+
+# Test for the /boards/template-images endpoint
+@patch('app.routers.board_router.list_template_images', side_effect=mock_list_template_images)
+def test_get_template_images(mock_list_template_images, client):
+    response = client.get("/boards/images/template-images")
+
+    print(response.status_code)  # Check status code
+    print(response.json())
+
+    # Check that the response is successful
+    assert response.status_code == 200
+
+    # Check that the response data matches the mock S3 data
+    assert response.json() == MOCK_S3_RESPONSE

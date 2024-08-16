@@ -7,14 +7,14 @@ from ..crud.board_crud import create_board, update_board, read_board_by_id, dele
 from ..database import get_session
 from sqlmodel import Session
 from ..models.board import Board
+from ..services.s3_service import list_template_images
 
 router = APIRouter()
 
 
 # current_user authenticates the route, if not authenticated the route doesnt work
 @router.post("/boards", response_model=BoardReadWithOwner)
-def create_board_endpoint(board: BoardCreate, db: Session = Depends(get_session),
-                          current_user: User = Depends(get_current_active_user)):
+def create_board_endpoint(board: BoardCreate, db: Session = Depends(get_session)):
     db_board = create_board(db, board)
     return db_board
 
@@ -54,3 +54,8 @@ def read_boards_pagination_endpoint(skip: int = Query(0, ge=0), limit: int = Que
 def read_boards_by_owner_id_endpoint(owner_id: int, db: Session = Depends(get_session)):
     result = read_boards_by_owner_id(db, owner_id)
     return result
+
+
+@router.get("/boards/images/template-images", response_model=list[str])
+def get_template_images():
+    return list_template_images("boards/template_images/")

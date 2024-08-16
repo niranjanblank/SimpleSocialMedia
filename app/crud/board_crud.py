@@ -2,15 +2,41 @@ from sqlmodel import Session, select
 from ..schemas.schemas import BoardCreate, BoardUpdate
 from ..models.board import Board
 from ..models.user import User
-from fastapi import HTTPException
-def create_board(db: Session, board: BoardCreate):
+from fastapi import HTTPException, UploadFile
+import os
+from dotenv import load_dotenv
+from ..services.s3_service import upload_to_s3
+
+load_dotenv()
+
+DEFAULT_IMAGE_URL = os.getenv('DEFAULT_IMAGE_URL')
+
+
+def create_board(db: Session, board: BoardCreate, image: UploadFile = None):
     # Check if the user exists
     user_exists = db.exec(select(User).where(User.id == board.owner_id)).first() is not None
     if not user_exists:
         raise HTTPException(status_code=400, detail=f"User with id of {board.owner_id} not available")
 
     try:
-        db_board = Board(title=board.title, description=board.description, owner_id=board.owner_id)
+        # Initialize with default image URL from environment variable
+        image_url = DEFAULT_IMAGE_URL
+        # Prioritize uploaded image
+        if image:
+            image_url = upload_to_s3(image, f"boards/{board.owner_id}/{image.filename}")
+        # Then check the background_image_url provided in BoardCreate
+        elif board.background_image_url:
+            image_url = board.background_image_url
+        # If neither is provided, use the default image URL from the environment
+        else:
+            image_url = DEFAULT_IMAGE_URL
+
+        db_board = Board(
+            title=board.title,
+            description=board.description,
+            owner_id=board.owner_id,
+            background_image_url=image_url
+        )
         db.add(db_board)
         db.commit()
         db.refresh(db_board)
@@ -22,7 +48,7 @@ def create_board(db: Session, board: BoardCreate):
 
 def read_board_by_id(db: Session, board_id: int):
     try:
-        db_board = db.get(Board,board_id)
+        db_board = db.get(Board, board_id)
         if db_board is None:
             raise HTTPException(status_code=404, detail="Board not found")
         return db_board
@@ -33,7 +59,6 @@ def read_board_by_id(db: Session, board_id: int):
         # Handle unexpected errors
         # Log the error or handle it as needed
         raise HTTPException(status_code=500, detail=f"An error occurred in boards: {e}")
-
 
 
 def update_board(db: Session, board_id: int, board: BoardUpdate):
@@ -63,6 +88,7 @@ def delete_board(db: Session, board_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred in board deletion: {e}")
 
+
 def read_boards(db: Session, skip: int, limit: int):
     try:
         # statement to select the users based on skip and limit for pagination
@@ -77,7 +103,8 @@ def read_boards(db: Session, skip: int, limit: int):
         # Log the error or handle it as needed
         raise HTTPException(status_code=500, detail=f"An error occurred while getting Boards: {e}")
 
-def read_boards_by_owner_id(db:Session, owner_id):
+
+def read_boards_by_owner_id(db: Session, owner_id):
     """Get all the boards by owner_id"""
     # check if the owner exists in the database
     owner_exists = db.exec(select(User).where(User.id == owner_id)).first() is not None
@@ -94,4 +121,3 @@ def read_boards_by_owner_id(db:Session, owner_id):
         # Handle unexpected errors
         # Log the error or handle it as needed
         raise HTTPException(status_code=500, detail=f"An error occurred while getting Board {e}")
-

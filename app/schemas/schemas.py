@@ -8,11 +8,12 @@ class BoardBase(BaseModel):
     title: str
     description: str
     owner_id: int
+    background_image_url: str | None = None
 
 
 class BoardCreate(BoardBase):
     """ Fields needed when creating a board"""
-    pass
+    background_image_url: str | None = None
 
 
 class BoardRead(BoardBase):
@@ -25,6 +26,7 @@ class BoardUpdate(BoardBase):
     title: str | None = None
     description: str | None = None
     owner_id: int | None = None
+    background_image_url: str | None = None
 
 
 ## User Schemas
