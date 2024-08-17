@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, UploadFile, File, HTTPException
 from ..schemas.schemas import BoardRead, BoardCreate, BoardUpdate, BoardReadWithOwner, BoardReadWithListAndCard
 from ..models.user import User
 from ..auth import get_current_active_user
 from ..crud.board_crud import create_board, update_board, read_board_by_id, delete_board, read_boards, \
-    read_boards_by_owner_id
+    read_boards_by_owner_id, update_board_background_image
 from ..database import get_session
 from sqlmodel import Session
 from ..models.board import Board
@@ -34,6 +34,14 @@ def read_board_endpoint(board_id: int, db: Session = Depends(get_session)):
 @router.put("/boards/{board_id}", response_model=BoardReadWithOwner)
 def update_board_endpoint(board_id: int, board: BoardUpdate, db: Session = Depends(get_session)):
     db_board = update_board(db, board_id, board)
+    return db_board
+
+
+@router.put("/boards/update-background/{board_id}", response_model=BoardReadWithOwner)
+def update_board_background_image_endpoint(board_id: int,
+                                           image: UploadFile = File(...),
+                                           db: Session = Depends(get_session)):
+    db_board = update_board_background_image(db, board_id, image)
     return db_board
 
 

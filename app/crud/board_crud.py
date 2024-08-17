@@ -76,6 +76,27 @@ def update_board(db: Session, board_id: int, board: BoardUpdate):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred in boards: {e}")
 
+def update_board_background_image(db: Session, board_id: int, image: UploadFile):
+    # Retrieve the board from the database
+    db_board = db.get(Board, board_id)
+    if not db_board:
+        raise HTTPException(status_code=404, detail="Board not found")
+
+    try:
+        # Upload the image to S3 and get the image URL
+        image_url = upload_to_s3(image, f"boards/{board_id}/{image.filename}")
+
+        # Update the board's background_image_url in the database
+        db_board.background_image_url = image_url
+        db.add(db_board)
+        db.commit()
+        db.refresh(db_board)
+
+        return db_board
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"An error occurred while updating the background image: {e}")
+
 
 def delete_board(db: Session, board_id: int):
     try:
