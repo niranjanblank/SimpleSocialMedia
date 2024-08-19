@@ -1,4 +1,7 @@
 from sqlmodel import SQLModel, Field, Relationship
+from typing import TYPE_CHECKING
+
+
 
 
 class Board(SQLModel, table=True):
@@ -15,3 +18,6 @@ class Board(SQLModel, table=True):
     # Relationship to BoardList
     # cascade delete, when a board is deleted, all the lists inside this board will be deleted
     board_lists: list["BoardList"] = Relationship(back_populates="board", cascade_delete=True)
+
+    # Relationship to labels
+    board_labels: list["BoardLabel"] = Relationship(back_populates="board", cascade_delete=True)

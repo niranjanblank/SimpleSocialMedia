@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Query, UploadFile, File, HTTPException
-from ..schemas.schemas import BoardRead, BoardCreate, BoardUpdate, BoardReadWithOwner, BoardReadWithListAndCard
+from ..schemas.schemas import BoardRead, BoardCreate, BoardUpdate, BoardReadWithOwner, BoardReadWithListAndCardAndLabels
 from ..models.user import User
 from ..auth import get_current_active_user
 from ..crud.board_crud import create_board, update_board, read_board_by_id, delete_board, read_boards, \
@@ -25,7 +25,7 @@ def read_board_endpoint(board_id: int, db: Session = Depends(get_session)):
     return db_board
 
 
-@router.get("/boards/data/{board_id}", response_model=BoardReadWithListAndCard)
+@router.get("/boards/data/{board_id}", response_model=BoardReadWithListAndCardAndLabels)
 def read_board_endpoint(board_id: int, db: Session = Depends(get_session)):
     db_board = read_board_by_id(db, board_id)
     return db_board

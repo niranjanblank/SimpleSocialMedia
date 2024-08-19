@@ -31,9 +31,7 @@ def find_highest_order_card_in_list_endpoint(list_id: int, db: Session = Depends
 # delete the card
 @router.delete("/list_card/{list_card_id}")
 def delete_list_card_endpoint(list_card_id: int, db: Session = Depends(get_session)):
-    print(f"Deleting card with ID: {list_card_id}")
     result = delete_card_by_id(db,list_card_id)
-    print(f"Result: {result}")
     return result
 
 

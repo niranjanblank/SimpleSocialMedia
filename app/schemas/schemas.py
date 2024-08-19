@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
+
 ## Board Schemas
 class BoardBase(BaseModel):
     """ Base class for other schemas """
@@ -68,6 +69,26 @@ class BoardListUpdate(BaseModel):
     title: str | None = None
     order: int | None = None
 
+
+# Labels Schema
+class LabelSchema(BaseModel):
+    """Fields of Label"""
+    title: str
+    color: str
+    board_id: int
+
+
+class LabelRead(LabelSchema):
+    id: int
+
+
+class LabelCreate(LabelSchema):
+    pass
+
+
+class LabelWithBoard(LabelSchema):
+    board: BoardRead
+
 ## ListCard Schemas
 class ListCardBase(BaseModel):
     """Base class for the cards in a lists"""
@@ -80,6 +101,7 @@ class ListCardBase(BaseModel):
     updated_at: datetime | None = None
     completed: bool | None = None
 
+
 class ListCardCreate(ListCardBase):
     """ Attributes required to create a card in a list """
     pass
@@ -90,6 +112,7 @@ class ListCardRead(ListCardBase):
     id: int
     pass
 
+
 class ListCardUpdate(BaseModel):
     """ Attributes returned when updating list card """
     title: str | None = None
@@ -99,14 +122,17 @@ class ListCardUpdate(BaseModel):
     due_date: datetime | None = None
     completed: bool | None = None
 
+
 # for jwt
 class Token(BaseModel):
     access_token: str
     token_type: str
 
+
 class TokenData(BaseModel):
     username: str
     user_id: int
+
 
 # Relationships
 class UserReadWithBoard(UserBase):
@@ -118,11 +144,14 @@ class BoardReadWithOwner(BoardBase):
     id: int
     owner: UserRead
 
-class BoardListWithCards(BoardListRead):
-    list_cards: list[ListCardRead]=[]
 
-class BoardReadWithListAndCard(BoardRead):
+class BoardListWithCards(BoardListRead):
+    list_cards: list[ListCardRead] = []
+
+
+class BoardReadWithListAndCardAndLabels(BoardRead):
     board_lists: list[BoardListWithCards] = []
+    board_labels: list[LabelRead] = []
 
 class ListCardWithList(ListCardRead):
     belongs_to_list: BoardList

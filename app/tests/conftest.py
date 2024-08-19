@@ -9,6 +9,7 @@ from ..models.user import User
 from ..models.board import Board
 from ..models.board_lists import BoardList
 from ..models.list_card import ListCard
+from ..models.board_label import BoardLabel
 
 load_dotenv()
 
@@ -138,4 +139,28 @@ def list_card_data(test_db_session, board_list_data):
 
     return list_cards
 
+#fixture for singe label
+@pytest.fixture(scope="function")
+def label_data(test_db_session, board_data):
+    test_label = BoardLabel(title="Label 1", color="#FF5733", board_id=board_data.id)
+    test_db_session.add(test_label)
+    test_db_session.commit()
+    test_db_session.refresh(test_label)
+    return test_label
+
+# fixture for labels data
+@pytest.fixture(scope="function")
+def labels_data(test_db_session, board_data):
+    # adding labels
+    test_labels = [
+        BoardLabel(title="Label 1", color="#FF5733", board_id=board_data.id),
+        BoardLabel(title="Label 2", color="#33FF57", board_id=board_data.id),
+        BoardLabel(title="Label 3", color="#3357FF", board_id=board_data.id)
+    ]
+
+    for label in test_labels:
+        test_db_session.add(label)
+    test_db_session.commit()
+
+    return test_labels
 

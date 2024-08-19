@@ -13,8 +13,9 @@ def create_board_list(db: Session, board_list: BoardListCreate):
     try:
         # Determine the order
         if board_list.order is None:
-            max_order_result = db.exec(select(BoardList.order).where(BoardList.board_id == board_list.board_id).order_by(
-                BoardList.order.desc())).first()
+            max_order_result = db.exec(
+                select(BoardList.order).where(BoardList.board_id == board_list.board_id).order_by(
+                    BoardList.order.desc())).first()
 
             if max_order_result:
                 new_order = max_order_result + 1
@@ -22,7 +23,6 @@ def create_board_list(db: Session, board_list: BoardListCreate):
                 new_order = 1
         else:
             new_order = board_list.order
-
 
         db_board_list = BoardList(title=board_list.title,
                                   board_id=board_list.board_id,
@@ -115,8 +115,8 @@ def find_highest_order_list_in_board(db: Session, board_id: int):
         return highest_order_list
 
     except HTTPException as http_ex:
-            # Reraise the HTTPException to be handled by FastAPI
-            raise http_ex
+        # Reraise the HTTPException to be handled by FastAPI
+        raise http_ex
     except Exception as e:
         # Handle unexpected errors
         # Log the error or handle it as needed
