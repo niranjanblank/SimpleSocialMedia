@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field, Relationship
-
+from .card_label import CardLabelLink
 
 class BoardLabel(SQLModel, table=True):
     __tablename__ = "labels"
@@ -12,5 +12,5 @@ class BoardLabel(SQLModel, table=True):
     # cascade delete, when a board is deleted, all the labels inside this board will be deleted
     board: 'Board' = Relationship(back_populates="board_labels")
 
-
+    cards: list["ListCard"] = Relationship(back_populates="labels", link_model=CardLabelLink)
 

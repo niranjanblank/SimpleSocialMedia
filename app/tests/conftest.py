@@ -10,6 +10,7 @@ from ..models.board import Board
 from ..models.board_lists import BoardList
 from ..models.list_card import ListCard
 from ..models.board_label import BoardLabel
+from ..models.card_label import CardLabelLink
 
 load_dotenv()
 
@@ -29,11 +30,18 @@ def test_db_session(test_db_engine):
     transaction = connection.begin()
     session = Session(bind=connection)
 
-    yield session  # use this session
-
-    session.close()
-    transaction.rollback()  # Ensure a clean state for the next test
-    connection.close()
+    try:
+        yield session  # use this session
+        session.flush()  # Ensure all changes are flushed to the database
+        session.expire_all()  # Expire all instances in the session to clear any cached state
+    except Exception as e:
+        transaction.rollback()  # Rollback the transaction on any exception
+        raise e
+    finally:
+        session.close()  # Close the session
+        if transaction.is_active:
+            transaction.rollback()  # Rollback the transaction if it's still active
+        connection.close()  # Close the connection
 
 
 @pytest.fixture(scope="function")
@@ -164,3 +172,11 @@ def labels_data(test_db_session, board_data):
 
     return test_labels
 
+@pytest.fixture(scope="function")
+def card_label_data(test_db_session: Session, list_card_data, label_data):
+    # This fixture creates a CardLabelLink instance for testing
+    card_label = CardLabelLink(card_id=list_card_data[0].id, label_id=label_data.id)
+    test_db_session.add(card_label)
+    test_db_session.commit()
+    test_db_session.refresh(card_label)
+    return card_label

@@ -33,3 +33,20 @@ def test_delete_label(client, label_data):
 
     assert response.status_code == 200
     assert response.json() == {"deleted": True}
+
+
+def test_update_label(client, label_data):
+    update_payload = {
+        "title": "Title Updated",
+        "color": "#ffffff"
+    }
+
+    # perform the put request to update the card
+    response = client.put(f"/labels/{label_data.id}", json=update_payload)
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["title"] == update_payload["title"]
+    assert data["color"] == update_payload["color"]

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
-from ..schemas.schemas import LabelRead, LabelCreate
+from ..schemas.schemas import LabelRead, LabelCreate, LabelUpdate
 from sqlmodel import Session
 from ..database import get_session
-from ..crud.label_crud import create_label, read_label_by_board_id, delete_label_by_id
+from ..crud.label_crud import create_label, read_label_by_board_id, delete_label_by_id, update_label
 
 router = APIRouter()
 
@@ -21,4 +21,9 @@ def read_label_by_board_id_endpoint(board_id: int, db: Session = Depends(get_ses
 @router.delete("/labels/{label_id}")
 def delete_label_by_id_endpoint(label_id: int,  db: Session = Depends(get_session)):
     result = delete_label_by_id(db, label_id)
+    return result
+
+@router.put("/labels/{label_id}")
+def update_label_endpoint(label_id: int,label: LabelUpdate, db: Session = Depends(get_session)):
+    result = update_label(db, label_id, label)
     return result

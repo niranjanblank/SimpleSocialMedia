@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from ..schemas.schemas import LabelCreate
+from ..schemas.schemas import LabelCreate, LabelUpdate
 from ..models.board import Board
 from ..models.board_label import BoardLabel
 from fastapi import HTTPException
@@ -61,3 +61,28 @@ def delete_label_by_id(db: Session, label_id: int):
         raise http_ex
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred in Label deletion: {e}")
+
+
+def update_label(db: Session, label_id: int, label: LabelUpdate):
+    """
+    Update the label based on the data given
+    """
+    try:
+        db_label = db.get(BoardLabel, label_id)
+        if not db_label:
+            raise HTTPException(status_code=404, detail="Label not found")
+        # exclude_unset excludes any fields that have not been assigned a value
+        update_data = label.model_dump(exclude_unset=True)
+
+        for key, value in update_data.items():
+            setattr(db_label, key, value)
+
+        db.add(db_label)
+        db.commit()
+        db.refresh(db_label)
+        return db_label
+    except HTTPException as http_ex:
+        # Reraise the HTTPException to be handled by FastAPI
+        raise http_ex
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred in the label: {e}")

@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field, Relationship
 from datetime import datetime
 from typing import Optional
-
+from .card_label import CardLabelLink
 class ListCard(SQLModel, table=True):
     __tablename__ = "list_cards"
     id: int = Field(default=None, primary_key=True)
@@ -20,3 +20,5 @@ class ListCard(SQLModel, table=True):
 
     # Relationship to the board_list
     belongs_to_list: 'BoardList' = Relationship(back_populates="list_cards")
+
+    labels: list["BoardLabel"] = Relationship(back_populates="cards", link_model=CardLabelLink)

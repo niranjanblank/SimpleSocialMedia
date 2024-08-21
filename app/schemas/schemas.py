@@ -89,6 +89,13 @@ class LabelCreate(LabelSchema):
 class LabelWithBoard(LabelSchema):
     board: BoardRead
 
+
+class LabelUpdate(LabelSchema):
+    title: str | None = None
+    color: str | None = None
+    board_id: int | None = None
+
+
 ## ListCard Schemas
 class ListCardBase(BaseModel):
     """Base class for the cards in a lists"""
@@ -153,5 +160,11 @@ class BoardReadWithListAndCardAndLabels(BoardRead):
     board_lists: list[BoardListWithCards] = []
     board_labels: list[LabelRead] = []
 
+
 class ListCardWithList(ListCardRead):
     belongs_to_list: BoardList
+
+
+class CardLabelBase(BaseModel):
+    label_id: int
+    card_id: int
