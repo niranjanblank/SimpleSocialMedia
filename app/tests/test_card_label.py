@@ -60,3 +60,22 @@ def test_create_card_label_relationship_conflict(client, card_label_data):
 
     # Assert the response status code
     assert response.status_code == 400
+
+def test_delete_card_label_relationship(client, list_card_data, label_data):
+    # Create a relationship to delete
+    card_id = list_card_data[0].id
+    label_id = label_data.id
+
+    # Create the card-label relationship
+    response = client.post("/card-labels", json={"card_id": card_id, "label_id": label_id})
+    assert response.status_code == 200
+
+    # Now delete the relationship
+    delete_response = client.delete(f"/card-labels/{card_id}/{label_id}")
+    assert delete_response.status_code == 200
+    assert delete_response.json() == {"deleted": True}
+
+    # Ensure the relationship no longer exists
+    double_delete_response = client.delete(f"/card-labels/{card_id}/{label_id}")
+    assert double_delete_response.status_code == 404
+    assert double_delete_response.json() == {"detail": "Card-label relationship not found."}

@@ -5,7 +5,8 @@ from ..models.board_label import BoardLabel
 from ..models.card_label import CardLabelLink
 from ..schemas.schemas import CardLabelBase
 from sqlalchemy.exc import IntegrityError
-
+import logging
+import traceback
 
 def create_card_label_relationship(db: Session, card_label: CardLabelBase):
     try:
@@ -49,3 +50,25 @@ def create_card_label_relationship(db: Session, card_label: CardLabelBase):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
+
+def delete_card_label_relationship(db: Session, card_label: CardLabelBase):
+    try:
+        # Finding the existing card-label link
+        existing_link = db.exec(select(CardLabelLink).where(
+            CardLabelLink.card_id == card_label.card_id,
+            CardLabelLink.label_id == card_label.label_id
+        )).first()
+
+        if not existing_link:
+            raise HTTPException(status_code=404, detail="Card-label relationship not found.")
+
+        db.delete(existing_link)
+        db.commit()
+        return {"deleted": True}
+
+    except HTTPException as e:
+        # Re-raise HTTPExceptions to be handled by FastAPI's exception handling
+        raise e
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
