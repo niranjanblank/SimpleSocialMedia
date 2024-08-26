@@ -1,9 +1,11 @@
 from ..schemas.schemas import ListCardCreate, ListCardUpdate
-from sqlmodel import Session,select
+from sqlmodel import Session, select
 from ..models.board_lists import BoardList
 from ..models.list_card import ListCard
 from fastapi import HTTPException
-from datetime import datetime
+from datetime import datetime, date
+from sqlalchemy.sql import func, and_
+
 
 #  Create card in a list
 def create_list_card(db: Session, list_card: ListCardCreate):
@@ -18,7 +20,7 @@ def create_list_card(db: Session, list_card: ListCardCreate):
             max_order = db.exec(select(ListCard.order).where(ListCard.list_id == list_card.list_id).order_by(
                 ListCard.order.desc())).first()
             if max_order is not None:
-                new_order = max_order+ 1
+                new_order = max_order + 1
             else:
                 new_order = 1
         else:
@@ -56,8 +58,9 @@ def read_list_card_by_id(db: Session, list_card_id: int):
         # Log the error or handle it as needed
         raise HTTPException(status_code=500, detail=f"An error occurred while finding the card: {e}")
 
+
 # read all the card in a list by list_id
-def read_list_card_by_list_id(db:Session, list_id: int):
+def read_list_card_by_list_id(db: Session, list_id: int):
     # check if the list exists
     list_exists = db.exec(select(BoardList).where(BoardList.id == list_id)).first() is not None
 
@@ -66,7 +69,7 @@ def read_list_card_by_list_id(db:Session, list_id: int):
         raise HTTPException(status_code=404, detail=f"List with id of {list_id} not available")
 
     try:
-        statement= select(ListCard).where(ListCard.list_id == list_id)
+        statement = select(ListCard).where(ListCard.list_id == list_id)
         list_card_data = db.exec(statement)
         return list_card_data
     except HTTPException as http_ex:
@@ -97,6 +100,7 @@ def find_highest_order_card_in_list(db: Session, list_id: int):
         # Log the error or handle it as needed
         raise HTTPException(status_code=500, detail=f"An error occurred while finding the highest order card: {e}")
 
+
 def update_list_card(db: Session, list_card_id: int, card_update: ListCardUpdate):
     """
     Update the list card based on the data given
@@ -124,6 +128,7 @@ def update_list_card(db: Session, list_card_id: int, card_update: ListCardUpdate
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred in card: {e}")
 
+
 def delete_card_by_id(db: Session, list_card_id):
     """ Delete card list by id"""
     try:
@@ -138,3 +143,26 @@ def delete_card_by_id(db: Session, list_card_id):
         raise http_ex
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred in card deletion: {e}")
+
+
+def read_cards_due_today(db: Session):
+    """Fetch all cards that are due today"""
+    try:
+        current_date = date.today()
+        statement = select(ListCard).where(func.date(ListCard.due_date) == current_date)
+        cards_due_today = db.exec(statement).all()
+
+        return cards_due_today
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred while fetching today's cards: {e}")
+
+def read_cards_overdue_today(db: Session):
+    """ Fetch all cards that are overdue today"""
+    try:
+        current_date = date.today()
+        statement = select(ListCard).where(and_(func.date(ListCard.due_date) < current_date, ~ListCard.completed))
+        cards_overdue = db.exec(statement).all()
+        return cards_overdue
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred while fetching today's cards: {e}")

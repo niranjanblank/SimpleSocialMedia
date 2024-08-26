@@ -130,6 +130,15 @@ class ListCardUpdate(BaseModel):
     completed: bool | None = None
 
 
+class CardLabelBase(BaseModel):
+    label_id: int
+    card_id: int
+
+
+class ListCardWithLabels(ListCardRead):
+    labels: list[LabelRead] = []
+
+
 # for jwt
 class Token(BaseModel):
     access_token: str
@@ -153,7 +162,7 @@ class BoardReadWithOwner(BoardBase):
 
 
 class BoardListWithCards(BoardListRead):
-    list_cards: list[ListCardRead] = []
+    list_cards: list[ListCardWithLabels] = []
 
 
 class BoardReadWithListAndCardAndLabels(BoardRead):
@@ -164,7 +173,8 @@ class BoardReadWithListAndCardAndLabels(BoardRead):
 class ListCardWithList(ListCardRead):
     belongs_to_list: BoardList
 
+class ListWithBoard(BoardListRead):
+    board: BoardRead
 
-class CardLabelBase(BaseModel):
-    label_id: int
-    card_id: int
+class CardWithListAndLabel(ListCardWithLabels):
+    belongs_to_list: ListWithBoard

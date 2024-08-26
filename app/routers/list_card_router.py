@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends
-from ..schemas.schemas import ListCardRead, ListCardCreate, ListCardUpdate, ListCardWithList
+from ..schemas.schemas import ListCardRead, ListCardCreate, ListCardUpdate, \
+    ListCardWithList, ListCardWithLabels, CardWithListAndLabel
 from sqlmodel import Session
 from ..database import get_session
 from ..crud.list_card_crud import create_list_card, read_list_card_by_list_id, \
-    find_highest_order_card_in_list, update_list_card, delete_card_by_id, read_list_card_by_id
+    find_highest_order_card_in_list, update_list_card, delete_card_by_id, read_list_card_by_id, \
+    read_cards_due_today, read_cards_overdue_today
 
 router = APIRouter()
 
@@ -18,7 +20,7 @@ def get_list_card_by_list_id_endpoint(list_id: int, db: Session = Depends(get_se
     db_list_cards = read_list_card_by_list_id(db, list_id)
     return db_list_cards
 
-@router.get("/list_card/{list_card_id}", response_model= ListCardWithList )
+@router.get("/list_card/{list_card_id}", response_model= ListCardWithLabels )
 def get_list_card_by_id(list_card_id: int, db: Session = Depends(get_session)):
     db_card = read_list_card_by_id(db, list_card_id)
     return db_card
@@ -40,3 +42,11 @@ def update_list_card_endpoint(list_card_id: int, card_update: ListCardUpdate,
                               db: Session = Depends(get_session)):
     db_card = update_list_card(db,list_card_id,card_update)
     return db_card
+
+@router.get("/list_card/due/due_today", response_model=list[CardWithListAndLabel])
+def get_cards_due_today_endpoint(db: Session = Depends(get_session)):
+    return read_cards_due_today(db)
+
+@router.get("/list_card/overdue/today", response_model=list[CardWithListAndLabel])
+def get_cards_overdue_endpoint(db: Session = Depends(get_session)):
+    return read_cards_overdue_today(db)
